@@ -1,3 +1,9 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0d1013">
 <title>Atlas Drive</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -52,6 +58,21 @@ h1 span{color:var(--accent)}
 .status{min-height:1.3em;font-size:13.5px;line-height:1.4;color:var(--muted)}
 .status.warn{color:#ffc38a}
 .attrib{font-size:11px;color:#7d766d}
+.cars{display:flex;flex-wrap:wrap;gap:6px}
+.cars button{padding:7px 11px;border-radius:8px;border:1px solid var(--line);background:rgba(255,255,255,.03);font-weight:600;font-size:13.5px;color:var(--muted)}
+.cars button.on{border-color:var(--accent);background:rgba(255,141,36,.12);color:var(--text)}
+.check{display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:1.35}
+.check input{width:20px;height:20px;margin:1px 0 0;accent-color:var(--accent);flex:none}
+.check small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+.keyrow{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.keyrow input{padding:9px 11px;border-radius:8px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--text);font:inherit;font-size:14px;min-width:0}
+.keyrow a{color:var(--accent);font-size:12.5px}
+.street{position:absolute;left:16px;top:calc(env(safe-area-inset-top,0px) + 54px);display:flex;flex-direction:column;align-items:flex-start;gap:4px;max-width:46vw}
+.street .plate{display:flex;align-items:center;gap:8px;padding:6px 11px;border-radius:7px;background:#16613a;border:2px solid #e9f2ec;color:#fff;font-family:var(--display);font-weight:700;font-size:17px;letter-spacing:.02em;box-shadow:0 4px 14px rgba(0,0,0,.35);max-width:100%}
+.street .plate span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.street .tag{padding:3px 8px;border-radius:5px;background:var(--accent);color:var(--accent-ink);font-family:var(--display);font-weight:700;font-size:12px;letter-spacing:.12em;text-transform:uppercase}
+.loading{padding:4px 9px;border-radius:6px;background:var(--panel);border:1px solid var(--line);font-size:12px;color:var(--muted)}
+.attrib-hud{position:absolute;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 2px);transform:translateX(-50%);font-size:10.5px;color:rgba(244,239,231,.75);text-shadow:0 1px 3px rgba(0,0,0,.8);white-space:nowrap;max-width:94vw;overflow:hidden;text-overflow:ellipsis}
 .rotate-hint{display:none;font-size:12.5px;color:var(--muted)}
 @media (orientation:portrait) and (pointer:coarse){.rotate-hint{display:block}}
 
@@ -69,7 +90,7 @@ h1 span{color:var(--accent)}
 .arrow svg{width:38px;height:38px;filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))}
 .mini{position:absolute;top:calc(env(safe-area-inset-top,0px) + 54px);right:16px;width:132px;height:132px;border-radius:50%;
   border:2px solid rgba(255,236,214,.22);box-shadow:0 6px 20px rgba(0,0,0,.45)}
-.speedo{position:absolute;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);transform:translateX(-50%);display:grid;grid-template-columns:auto auto;align-items:end;column-gap:8px;
+.speedo{position:absolute;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 20px);transform:translateX(-50%);display:grid;grid-template-columns:auto auto;align-items:end;column-gap:8px;
   font-family:var(--display);text-shadow:0 2px 12px rgba(0,0,0,.6)}
 .spd{font-weight:800;font-size:58px;line-height:.85;font-style:italic;font-variant-numeric:tabular-nums;min-width:2.1ch;text-align:right}
 .unitcol{display:flex;flex-direction:column;gap:2px;padding-bottom:4px}
@@ -101,9 +122,12 @@ h1 span{color:var(--accent)}
 .ctl.tall{height:116px;background:rgba(255,141,36,.22);border-color:rgba(255,141,36,.6)}
 .ctl.small{width:62px;height:52px;font-size:12px;align-self:flex-start;margin-bottom:64px}
 .ctl.down{background:rgba(255,141,36,.55);border-color:var(--accent)}
-@media (max-height:380px){.ctl{width:66px;height:66px}.ctl.tall{height:100px}.spd{font-size:46px}.mini{width:110px;height:110px}}
+@media (max-height:380px){.ctl{width:66px;height:66px}.ctl.tall{height:100px}.spd{font-size:46px}.mini{width:110px;height:110px}.street .plate{font-size:15px}}
+@media (max-width:560px){.chip{padding:6px 8px;font-size:12px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
+</head>
+<body>
 
 <canvas id="game"></canvas>
 
@@ -112,7 +136,7 @@ h1 span{color:var(--accent)}
     <div>
       <div class="kicker">Open-world street racer</div>
       <h1>ATLAS<span> </span>DRIVE</h1>
-      <p class="lede">Pick a real place. The game downloads its streets and buildings from OpenStreetMap and builds a city you can drive through.</p>
+      <p class="lede">Pick a real place and drive it. Streets, buildings, flyovers and landmark names stream in from OpenStreetMap as you go.</p>
     </div>
     <div>
       <div class="label">Where</div>
@@ -134,27 +158,47 @@ h1 span{color:var(--accent)}
       </div>
     </div>
     <div>
+      <div class="label">Car</div>
+      <div class="cars" id="cars"></div>
+    </div>
+    <div class="row2">
+      <div>
+        <div class="label">Traffic</div>
+        <div class="seg" id="trafficSeg"><button type="button" data-n="0">Off</button><button type="button" data-n="14" class="on">Normal</button><button type="button" data-n="24">Busy</button></div>
+      </div>
+      <div>
+        <div class="label">Time</div>
+        <div class="seg" id="timeSeg"><button type="button" data-t="day" class="on">Golden hour</button><button type="button" data-t="night">Night</button></div>
+      </div>
+    </div>
+    <div>
       <div class="label">Graphics</div>
       <div class="seg" id="qualSeg"><button type="button" data-q="high" class="on">High detail</button><button type="button" data-q="fast">Smooth</button></div>
     </div>
     <div>
-      <div class="label">Time</div>
-      <div class="seg" id="timeSeg"><button type="button" data-t="day" class="on">Golden hour</button><button type="button" data-t="night">Night</button></div>
+      <div class="label">Photoreal city</div>
+      <label class="check"><input type="checkbox" id="gOn"><span>Use Google photoreal 3D buildings<small>Real-world 3D imagery for real places. Needs your own Google Maps Platform key with the Map Tiles API and billing enabled.</small></span></label>
+      <div class="keyrow" id="gKeyRow" hidden>
+        <input id="gKey" type="password" placeholder="Paste your Google Maps API key" autocomplete="off" aria-label="Google Maps API key">
+        <a href="https://developers.google.com/maps/documentation/tile/get-api-key" target="_blank" rel="noopener">How to get a key</a>
+      </div>
     </div>
     <button id="driveBtn" class="drive" type="button">Drive</button>
     <div id="status" class="status" role="status"></div>
     <div class="rotate-hint">Turn your phone sideways for the best view.</div>
-    <div class="attrib">Map data © OpenStreetMap contributors · Car model by vicent091036 (Sketchfab) via the three.js examples · Keyboard: arrows or WASD, Space to drift, R to respawn</div>
+    <div class="attrib">Map data © OpenStreetMap contributors · Supercar model by vicent091036 (Sketchfab) via the three.js examples · Keyboard: arrows/WASD drive, Space drift, C camera, L names, R respawn</div>
   </div>
 </div>
 
 <div id="hud" class="hud" hidden>
   <div class="topbar">
-    <div class="chips"><button id="menuBtn" class="chip" type="button">Menu</button><button id="respawnBtn" class="chip" type="button">Respawn</button></div>
+    <div class="chips"><button id="menuBtn" class="chip" type="button">Menu</button><button id="camBtn" class="chip" type="button">View: Chase</button></div>
     <div class="runbox" id="runBox"><div class="t" id="timer">0:00.0</div><div class="cp" id="cpCount">Checkpoint 0 / 8</div></div>
-    <div class="chips"><button id="muteBtn" class="chip" type="button">Sound on</button></div>
+    <div class="chips"><button id="labelBtn" class="chip" type="button">Names on</button><button id="respawnBtn" class="chip" type="button">Respawn</button><button id="muteBtn" class="chip" type="button">Sound on</button></div>
   </div>
+  <div class="street"><div class="plate"><span id="streetName">Street</span></div><div class="tag" id="streetTag" hidden></div><div class="loading" id="loading" hidden>Loading streets ahead…</div></div>
   <canvas id="mini" class="mini" width="264" height="264"></canvas>
+  <div class="attrib-hud" id="attrib"></div>
   <div id="arrow" class="arrow">
     <svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 3 L33 33 L20 26 L7 33 Z" fill="#ff8d24" stroke="#1a0e02" stroke-width="1.5" stroke-linejoin="round"/></svg>
     <span id="cpDist">0 m</span>
@@ -190,9 +234,12 @@ h1 span{color:var(--accent)}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
-<script src="js/game1.js"></script>
-<script src="js/game2.js"></script>
-<script src="js/game3.js"></script>
-<script src="js/game4.js"></script>
-<script src="js/game5.js"></script>
-
+<script src="js/tiles3d.js"></script>
+<script src="js/core.js"></script>
+<script src="js/world.js"></script>
+<script src="js/vehicles.js"></script>
+<script src="js/traffic.js"></script>
+<script src="js/google.js"></script>
+<script src="js/game.js"></script>
+</body>
+</html>
